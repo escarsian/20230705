@@ -3,7 +3,10 @@
 <mapper namespace="co.micol.prj.member.mapper.MemberMapper">
 	<select id="memberSelectList" resultType="co.micol.prj.member.service.MemberVO">
 		SELECT * FROM MEMBER
-		<if test="key == 1"> WHERE MEMBER_NAME LIKE  '%' ||  #{val} || '%'</if>
+		<if test="key == 'name'"> WHERE MEMBER_NAME LIKE  '%' ||  #{val} || '%'</if>
+		<if test="key == 'tel'"> WHERE MEMBER_TEL LIKE '%' || #{val} || '%' </if>
+		<if test="key == 'address'"> WHERE MEMBER_ADDRESS LIKE '%' || #{val} || '%' </if>
+		<if test="key == 'all'"> WHERE 1 = 1</if>
 	</select>
 	
 	<select id="memberSelect" resultType="co.micol.prj.member.service.MemberVO">
@@ -11,11 +14,32 @@
 		<if test = "memberPassword != null"> AND MEMBER_PASSWORD = #{memberPassword}</if>
 	</select>
 	
-	<insert id="memberInsert"></insert>
-	<update id="memberUpdate"></update>
-	<delete id="memberDelete"></delete>
+	<insert id="memberInsert" parameterType="co.micol.prj.member.service.MemberVO">
+		INSERT INTO MEMBER(MEMBER_ID, MEMBER_PASSWORD, MEMBER_NAME, MEMBER_TEL, MEMBER_ADDRESS)
+		VALUES(#{memberId}, #{memberPassword}, #{memberName}, #{memberTel}, #{memberAddress})
+	</insert>
+	
+	<update id="memberUpdate" parameterType="co.micol.prj.member.service.MemberVO">
+		UPDATE MEMBER
+		<set>
+			<if test="memberPassword != null">MEMBER_PASSWORD = #{memberPassword},</if>
+			<if test="memberName != null">MEMBER_NAME = #{memberName},</if>
+			<if test="memberTel != null">MEMBER_TEL = #{memberTel},</if>
+			<if test="memberAddress != null">MEMBER_ADDRESS = #{memberAddress}</if>
+			<if test="memberAuthor != null">MEMBER_AUTHOR = #{memberAuthor}</if>
+		</set>
+		WHERE MEMBER_ID = #{memberId}
+	</update>
+	
+	<delete id="memberDelete" parameterType="co.micol.prj.member.service.MemberVO">
+		DELETE FROM MEMBER
+		WHERE MEMBER_ID = #{memberId}
+	</delete>
+	
 	<select id="isMemberIdCheck" resultType="boolean">
-		SELECT COUNT (*) AS ID FROM MEMBER WHERE MEMBER_ID = #{id} 
+		SELECT 
+		COUNT (*) AS ID FROM MEMBER 
+		WHERE MEMBER_ID = #{id} 
 	</select>
 
 </mapper>
